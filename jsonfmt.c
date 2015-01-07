@@ -22,6 +22,7 @@ void add_spaces( char **ptr, int count );
  * add for each level of braces.  On error, returns NULL and
  * writes an error message to *errptr (if errptr != NULL).
  * (The error message is not malloc'd and doesn't need freed.)
+ * On success, returns a malloc'd string.
  */
 char *json_format( const char *json, int indents, char **errptr )
 {
