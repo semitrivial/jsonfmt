@@ -2,6 +2,8 @@
  * Json-Formatter: A JSON prettier in C.
  * Turns arbitrary JSON strings into beautiful properly-whitespaced equivalents.
  *
+ * Also contains a JSON escape function.
+ *
  * By Sam Alexander
  *
  * On github:  https://github.org/semitrivial/jsonfmt
@@ -215,7 +217,7 @@ char *json_format( const char *json, int indents, char **errptr )
       }
 
       *bptr++ = *ptr;
-      continue;      
+      continue;
     }
 
     /*
@@ -309,6 +311,54 @@ char *json_format( const char *json, int indents, char **errptr )
   /*
    * Nul-terminate our buffer and return it.
    */
+  *bptr = '\0';
+  return buf;
+}
+
+/*
+ *  Escape function: insert escape code \ before double-quotes and backslashes.
+ *
+ *  The return value is malloc'd, and should be free'd when no longer needed.
+ *
+ *  Returns NULL if there is insufficient memory.
+ */
+char *json_escape( const char *txt )
+{
+  int len;
+  const char *ptr;
+  char *buf, *bptr;
+
+  for ( len=0, ptr = txt; *ptr; ptr++ )
+  {
+    switch( *ptr )
+    {
+      case '"':
+      case '\\':
+        len++;
+      default:
+        continue;
+    }
+  }
+
+  len += (ptr - txt);
+
+  buf = malloc( (len+1) * sizeof(char) );
+
+  if ( !buf )
+    return NULL;
+
+  for ( ptr = txt, bptr = buf; *ptr; ptr++ )
+  {
+    switch( *ptr )
+    {
+      case '"':
+      case '\\':
+        *bptr++ = '\\';
+      default:
+        *bptr++ = *ptr;
+    }
+  }
+
   *bptr = '\0';
   return buf;
 }

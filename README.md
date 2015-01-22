@@ -1,5 +1,6 @@
  Json-Formatter: A JSON prettifier function in C.
  Turns arbitrary JSON strings into beautiful properly-whitespaced equivalents.
+ Also contains a JSON escape function.
  
  By Sam Alexander
  
@@ -25,6 +26,21 @@ writes an error message to *errptr (if errptr != NULL).
 On success, returns a malloc'd string containing beautified JSON.
 
   char *json_format( const char *json, int indents, char **errptr )
+
+-----------------------
+json_escape
+-----------------------
+
+This library also contains a JSON escape function:
+
+  char *json_escape( const char *txt );
+
+This function takes a non-NULL string, txt, and inserts an escape
+character \ before any double-quotes and any backslashes.
+
+Returns a malloc'd string, which should be free'd when no longer
+needed.  Returns NULL in case of insufficient RAM.
+
 
 -----------------------------------------------------------
 EXAMPLE FILE
