@@ -16,7 +16,7 @@
 
 int main(void)
 {
-  char *x = "{\"lol\": xxx, \"whatever\":[a,b,c,\"\\t\"]}";
+  char *x = "{\"lol\": xxx, \"empty\": [  ], \"whatever\":[a,b,c,\"\\t\"]}";
   char *err = NULL;
   char *y = json_format( x, 2, &err );
   char *dialog, *escaped;
@@ -31,7 +31,7 @@ int main(void)
 
   free( y );
 
-  dialog = "\"Hello, \\ Wor-ld,\" said the poet.";
+  dialog = "\"Hello, \\ World,\" said the poet.";
   escaped = json_escape( dialog );
 
   printf( "Dangerous dialog: %s\n", dialog );

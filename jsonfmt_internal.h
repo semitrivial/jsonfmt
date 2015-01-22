@@ -20,4 +20,4 @@
 #define MAX_INDENT_SIZE 32
 
 void add_spaces( char **ptr, int count );
-
+int next_nonwhitespace_is( const char *ptr, char c, const char **where );

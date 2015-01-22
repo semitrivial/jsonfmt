@@ -14,11 +14,6 @@
 #include "jsonfmt_internal.h"
 
 /*
- * Local function prototypes
- */
-void add_spaces( char **ptr, int count );
-
-/*
  * Main function: given a string of json, prettify it with
  * beautiful whitespace.  "indents" is how many spaces to
  * add for each level of braces.  On error, returns NULL and
@@ -250,7 +245,25 @@ char *json_format( const char *json, int indents, char **errptr )
       case '{':
       case '[':
         /*
-         * Exception: Omit the initial newline if this brace is the first content we see
+         * Exception 1: If the list is empty, write it as [], with no newline preceding
+         */
+        {
+          char what = (*ptr == '{' ? '}' : ']');
+          char const *where;
+
+          if ( next_nonwhitespace_is( ptr, what, &where ) )
+          {
+            *bptr++ = *ptr;
+            *bptr++ = what;
+            ptr = where;
+            fContent = 1;
+            last_was_nonspace = 1;
+            continue;
+          }
+        }
+
+        /*
+         * Exception 2: Omit the initial newline if this brace is the first content we see
          */
         if ( fContent )
           *bptr++ = '\n';
@@ -404,5 +417,33 @@ void add_spaces( char **ptr, int count )
    */
   memcpy( *ptr, spaces, count * sizeof(char) );
 
-  *ptr += count;    
+  *ptr += count;
+}
+
+int next_nonwhitespace_is( const char *ptr, char c, const char **where )
+{
+  const char *rightptr = &ptr[1];
+
+  for ( rightptr = &ptr[1]; *rightptr && *rightptr != c; rightptr++ )
+  {
+    switch( *rightptr )
+    {
+      case ' ':
+      case '\t':
+      case '\n':
+      case '\r':
+        continue;
+      default:
+        break;
+    }
+    break;
+  }
+
+  if ( *rightptr == c )
+  {
+    *where = rightptr;
+    return 1;
+  }
+
+  return 0;
 }
