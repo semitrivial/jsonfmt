@@ -16,7 +16,7 @@
 
 int main(void)
 {
-  char *x = "{\"lol\": xxx, \"empty\": [  ], \"whatever\":[a,b,c,\"\\t\"]}";
+  char *x = "{\"lol\": xxx, \"empty\": [  ], \"whatever\":[a,b,c,\"\\t\"], \"nested\": {\"nested\": {\"nested\": [{\"nested\": []}]}}}";
   char *err = NULL;
   char *y = json_format( x, 2, &err );
   char *dialog, *escaped;

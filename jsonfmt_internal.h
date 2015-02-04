@@ -21,3 +21,4 @@
 
 void add_spaces( char **ptr, int count );
 int next_nonwhitespace_is( const char *ptr, char c, const char **where );
+int last_nonspace_was_newline( char *ptr, char *buf );

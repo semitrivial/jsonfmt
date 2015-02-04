@@ -263,14 +263,20 @@ char *json_format( const char *json, int indents, char **errptr )
         }
 
         /*
-         * Exception 2: Omit the initial newline if this brace is the first content we see
+         * Exception 2: Omit the initial newline if this brace is the first content we see,
+         * or if the last nonspace we wrote was a newline.
          */
         if ( fContent )
-          *bptr++ = '\n';
+        {
+          if ( !last_nonspace_was_newline( bptr, buf ) )
+          {
+            *bptr++ = '\n';
+            add_spaces( &bptr, indent );
+          }
+        }
         else
           fContent = 1;
 
-        add_spaces( &bptr, indent );
         *bptr++ = *ptr;
         *bptr++ = '\n';
         indent += indents;
@@ -446,4 +452,23 @@ int next_nonwhitespace_is( const char *ptr, char c, const char **where )
   }
 
   return 0;
+}
+
+int last_nonspace_was_newline( char *ptr, char *buf )
+{
+  for ( ; ; )
+  {
+    if ( ptr <= buf )
+      return 0;
+
+    ptr--;
+
+    if ( *ptr == ' ' )
+      continue;
+
+    if ( *ptr == '\n' )
+      return 1;
+
+    return 0;
+  }
 }
