@@ -20,6 +20,7 @@ int main(void)
   char *err = NULL;
   char *y = json_format( x, 2, &err );
   char *dialog, *escaped;
+  char *magic, *color = "black", *formatted_magic;
 
   if ( err )
   {
@@ -29,15 +30,33 @@ int main(void)
 
   printf( "%s\n\n", y );
 
-  free( y );
-
   dialog = "\"Hello, \\ World,\" said the poet.";
   escaped = json_escape( dialog );
 
   printf( "Dangerous dialog: %s\n", dialog );
   printf( "Escaped JSON:  {\"dialog\": \"%s\"}\n\n", escaped );
 
-  free( escaped );
+  /*
+   * Experimental material follows
+   */
+
+  magic = JSON
+  (
+    "type": "magic",
+    "color": color
+  );
+
+  formatted_magic = json_format( magic, 2, &err );
+
+  if ( err )
+  {
+    printf( "Error: %s\n\n", err );
+    return 0;
+  }
+
+  printf( "%s\n\n", formatted_magic );
+
+  json_gc();
 
   return 1;
 }
