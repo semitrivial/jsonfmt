@@ -9,6 +9,9 @@
  * On github:  https://github.org/semitrivial/jsonfmt
  */
 
+#ifndef JSONFMT_INCLUDE_GUARD
+#define JSONFMT_INCLUDE_GUARD
+
 char *json_format( const char *json, int indents, char **errptr );
 char *json_escape( const char *txt );
 
@@ -87,3 +90,5 @@ json_c_adapter\
 0 FOR_EACH( ADD_ONE, __VA_ARGS__ )\
 FOR_EACH( MAGIC_SPLIT, __VA_ARGS__ )\
 )
+
+#endif //JSONFMT_INCLUDE_GUARD

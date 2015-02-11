@@ -7,6 +7,9 @@
  * On github:  https://github.org/semitrivial/jsonfmt
  */
 
+#ifndef JSONFMT_INTERNAL_INCLUDE_GUARD
+#define JSONFMT_INTERNAL_INCLUDE_GUARD
+
 #include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -54,3 +57,5 @@ char *json_enquote( const char *str );
 char *json_escape_no_gc( const char *txt );
 char *json_escape_( const char *txt, int gc );
 char *prep_for_json_gc( char *str );
+
+#endif //JSONFMT_INTERNAL_INCLUDE_GUARD
