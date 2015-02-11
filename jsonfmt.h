@@ -6,7 +6,7 @@
  *
  * By Sam Alexander
  *
- * On github:  https://github.org/semitrivial/jsonfmt            
+ * On github:  https://github.org/semitrivial/jsonfmt
  */
 
 char *json_format( const char *json, int indents, char **errptr );
@@ -17,7 +17,9 @@ char *json_escape( const char *txt );
  */
 char *json_c_adapter( int paircnt, ... );
 void json_gc( void );
+char *json_array_worker( char * (*fnc) (void *), void **array );
 
+#define JS_ARRAY( fnc, array ) json_array_worker( (char * (*) (void*))fnc, (void**)array )
 
 /*
 * FOR_EACH macro thanks to Gregory Pakosz.

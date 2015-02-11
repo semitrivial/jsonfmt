@@ -19,7 +19,10 @@
  * add for each level of braces.  On error, returns NULL and
  * writes an error message to *errptr (if errptr != NULL).
  * (The error message is not malloc'd and doesn't need freed.)
- * On success, returns a malloc'd string.
+ * On success, returns the beautified json.
+ *
+ * Memory management: To free the strings output by json_format
+ * (and other functions in this library), call json_gc().
  */
 char *json_format( const char *json, int indents, char **errptr )
 {
@@ -614,4 +617,60 @@ char *json_enquote( const char *str )
   sprintf( buf, "\"%s\"", str );
 
   return prep_for_json_gc( buf );
+}
+
+char *json_array_worker( char * (*fnc) (void *), void **array )
+{
+  char **results, **rptr, *buf, *bptr;
+  void **ptr;
+  int cnt, len;
+
+  for ( ptr = array; *ptr; ptr++ )
+    ;
+
+  cnt = ptr - array;
+
+  if ( !cnt )
+    return prep_for_json_gc( strdup( "[]" ) );
+
+  if ( (results = malloc( sizeof( char *) * (cnt+1) )) == NULL )
+    return NULL;
+
+  rptr = results;
+
+  for ( ptr = array, len = 0; *ptr; ptr++ )
+  {
+    if ( (*rptr = (*fnc) (*ptr) ) == NULL )
+    {
+      free( results );
+      return NULL;
+    }
+    len += strlen( *rptr );
+    rptr++;
+  }
+
+  *rptr = NULL;
+
+  len += strlen("[]") + ( strlen(",") * (cnt-1) );
+
+  if ( (buf = malloc( len + 1 )) == NULL )
+  {
+    free( results );
+    return NULL;
+  }
+
+  bptr = buf;
+  *bptr = '[';
+
+  for (rptr = results; *rptr; rptr++)
+  {
+    bptr++;
+    strcpy( bptr, *rptr );
+    bptr = &bptr[strlen(bptr)];
+    *bptr = ',';
+  }
+  bptr[0] = ']';
+  bptr[1] = '\0';
+
+  return prep_for_json_gc(buf);
 }

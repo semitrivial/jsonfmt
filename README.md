@@ -23,7 +23,9 @@ beautiful whitespace.  "indents" is how many spaces to
 add for each level of braces.  On error, returns NULL and
 writes an error message to *errptr (if errptr != NULL).
 (The error message is not malloc'd and doesn't need freed.)
-On success, returns a malloc'd string containing beautified JSON.
+On success, returns a string containing beautified JSON.
+To free this string (and all others allocated by the library),
+call json_gc().
 
   char *json_format( const char *json, int indents, char **errptr )
 
@@ -38,8 +40,17 @@ This library also contains a JSON escape function:
 This function takes a non-NULL string, txt, and inserts an escape
 character \ before any double-quotes and any backslashes.
 
-Returns a malloc'd string, which should be free'd when no longer
-needed.  Returns NULL in case of insufficient RAM.
+Returns a string, or NULL in case of insufficient RAM.
+In order to free the string (along with all other strings allocated
+by the library), call json_gc().
+
+-----------------------
+json_gc
+-----------------------
+Call this function to free all memory that as allocated for
+the library so far.
+
+void json_gc( void );
 
 
 -----------------------------------------------------------
