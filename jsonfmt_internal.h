@@ -59,3 +59,4 @@ char *json_escape_( const char *txt, int gc );
 char *prep_for_json_gc( char *str );
 
 #endif //JSONFMT_INTERNAL_INCLUDE_GUARD
+

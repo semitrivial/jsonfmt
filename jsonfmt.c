@@ -674,3 +674,4 @@ char *json_array_worker( char * (*fnc) (void *), void **array )
 
   return prep_for_json_gc(buf);
 }
+
