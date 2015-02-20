@@ -11,6 +11,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "jsonfmt_internal.h"
 
 /*
@@ -339,16 +340,6 @@ char *json_format( const char *json, int indents, char **errptr )
 
 char *json_escape( const char *txt )
 {
-  return json_escape_( txt, 1 );
-}
-
-char *json_escape_no_gc( const char *txt )
-{
-  return json_escape_( txt, 0 );
-}
-
-char *json_escape_( const char *txt, int gc )
-{
   int len;
   const char *ptr;
   char *buf, *bptr;
@@ -386,7 +377,7 @@ char *json_escape_( const char *txt, int gc )
 
   *bptr = '\0';
 
-  return gc ? prep_for_json_gc(buf) : buf;
+  return buf;
 }
 
 /*
@@ -489,7 +480,7 @@ json_str *last_js_str[JSON_HASH];
 int is_json( const char *str )
 {
   json_str *x;
-  unsigned char hash = get_js_hash( str );
+  int hash = get_js_hash( str );
 
   for ( x = first_js_str[hash]; x; x = x->next )
     if ( x->str == str )
@@ -498,12 +489,9 @@ int is_json( const char *str )
   return 0;
 }
 
-unsigned char get_js_hash( char const *str )
+unsigned int get_js_hash( char const *str )
 {
-  while ( *str == '\"' || *str == '{' || *str == '[' )
-    str++;
-
-  return (unsigned char) *str;
+  return ((uintptr_t)str) % JSON_HASH;
 }
 
 char *prep_for_json_gc( char *str )
@@ -547,7 +535,7 @@ void json_gc( void )
 char *json_c_adapter( int paircnt, ... )
 {
   va_list vargs;
-  char **args, **argspt, *ch, *buf, *bptr;
+  char **args, **argspt, *ch, *buf, *bptr, *retval;
   int i, len, rawcnt;
 
   rawcnt = paircnt * 2;
@@ -561,6 +549,13 @@ char *json_c_adapter( int paircnt, ... )
   {
     ch = va_arg( vargs, char * );
 
+    if ( !ch )
+    {
+      args[i] = prep_for_json_gc( strdup( "null" ) );
+      len += strlen( "null" );
+      continue;
+    }
+
     if ( is_json( ch ) )
     {
       args[i] = ch;
@@ -568,7 +563,7 @@ char *json_c_adapter( int paircnt, ... )
     }
     else
     {
-      char *escaped = json_escape_no_gc( ch );
+      char *escaped = json_escape( ch );
       args[i] = json_enquote( escaped );
       free( escaped );
       len += strlen( args[i] );
@@ -607,7 +602,15 @@ char *json_c_adapter( int paircnt, ... )
 
   free( args );
 
-  return prep_for_json_gc( buf );
+  retval = json_format( buf, 2, NULL );
+
+  if ( retval )
+  {
+    free( buf );
+    return retval;
+  }
+  else
+    return prep_for_json_gc( buf );
 }
 
 char *json_enquote( const char *str )
@@ -621,9 +624,12 @@ char *json_enquote( const char *str )
 
 char *json_array_worker( char * (*fnc) (void *), void **array )
 {
-  char **results, **rptr, *buf, *bptr;
+  char **results, **rptr, *buf, *bptr, *retval;
   void **ptr;
   int cnt, len;
+
+  if ( !array )
+    return prep_for_json_gc( strdup( "[]" ) );
 
   for ( ptr = array; *ptr; ptr++ )
     ;
@@ -645,6 +651,7 @@ char *json_array_worker( char * (*fnc) (void *), void **array )
       free( results );
       return NULL;
     }
+
     len += strlen( *rptr );
     rptr++;
   }
@@ -669,9 +676,43 @@ char *json_array_worker( char * (*fnc) (void *), void **array )
     bptr = &bptr[strlen(bptr)];
     *bptr = ',';
   }
+
   bptr[0] = ']';
   bptr[1] = '\0';
 
-  return prep_for_json_gc(buf);
+  retval = json_format( buf, 2, NULL );
+
+  if ( retval )
+  {
+    free( buf );
+    return retval;
+  }
+  else
+    return prep_for_json_gc(buf);
+}
+
+char *str_to_json( char *x )
+{
+  if ( !x )
+    return prep_for_json_gc( strdup( "null" ) );
+
+  if ( is_json( x ) )
+    return x;
+  else
+  {
+    char *escaped = json_escape( x );
+    char *retval = json_enquote( escaped );
+    free( escaped );
+    return retval;
+  }
+}
+
+char *int_to_json( int x )
+{
+  char buf[256];
+
+  sprintf( buf, "%d", x );
+
+  return json_enquote( buf );
 }
 

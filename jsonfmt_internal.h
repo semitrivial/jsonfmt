@@ -14,7 +14,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#define JSON_HASH (UCHAR_MAX+1)
+#define JSON_HASH 1048576
 
 #define JSONFMT_ERR( txt )\
   do\
@@ -51,12 +51,11 @@ void add_spaces( char **ptr, int count );
 int next_nonwhitespace_is( const char *ptr, char c, const char **where );
 int last_nonspace_was_newline( char *ptr, char *buf );
 int is_json( const char *str );
-unsigned char get_js_hash( char const *str );
+unsigned int get_js_hash( char const *str );
 char *json_c_adapter( int paircnt, ... );
 char *json_enquote( const char *str );
-char *json_escape_no_gc( const char *txt );
-char *json_escape_( const char *txt, int gc );
 char *prep_for_json_gc( char *str );
 
 #endif //JSONFMT_INTERNAL_INCLUDE_GUARD
+
 

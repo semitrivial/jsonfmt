@@ -21,6 +21,8 @@ char *json_escape( const char *txt );
 char *json_c_adapter( int paircnt, ... );
 void json_gc( void );
 char *json_array_worker( char * (*fnc) (void *), void **array );
+char *str_to_json( char *x );
+char *int_to_json( int x );
 
 #define JS_ARRAY( fnc, array ) json_array_worker( (char * (*) (void*))fnc, (void**)array )
 
@@ -91,5 +93,8 @@ json_c_adapter\
 FOR_EACH( MAGIC_SPLIT, __VA_ARGS__ )\
 )
 
+#define JSON1(x) json_c_adapter( 1, 1?x, 0?x )
+
 #endif //JSONFMT_INCLUDE_GUARD
+
 
