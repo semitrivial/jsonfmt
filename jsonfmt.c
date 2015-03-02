@@ -669,6 +669,8 @@ char *json_array_worker( char * (*fnc) (void *), void **array )
     *bptr = ',';
   }
 
+  free( results );
+
   bptr[0] = ']';
   bptr[1] = '\0';
 
