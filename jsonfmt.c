@@ -535,7 +535,7 @@ void json_gc( void )
 char *json_c_adapter( int paircnt, ... )
 {
   va_list vargs;
-  char **args, **argspt, *ch, *buf, *bptr, *retval;
+  char **args, **argspt, *ch, *buf, *bptr;
   int i, len, rawcnt;
 
   rawcnt = paircnt * 2;
@@ -602,15 +602,7 @@ char *json_c_adapter( int paircnt, ... )
 
   free( args );
 
-  retval = json_format( buf, 2, NULL );
-
-  if ( retval )
-  {
-    free( buf );
-    return retval;
-  }
-  else
-    return prep_for_json_gc( buf );
+  return prep_for_json_gc( buf );
 }
 
 char *json_enquote( const char *str )
@@ -624,7 +616,7 @@ char *json_enquote( const char *str )
 
 char *json_array_worker( char * (*fnc) (void *), void **array )
 {
-  char **results, **rptr, *buf, *bptr, *retval;
+  char **results, **rptr, *buf, *bptr;
   void **ptr;
   int cnt, len;
 
@@ -680,15 +672,7 @@ char *json_array_worker( char * (*fnc) (void *), void **array )
   bptr[0] = ']';
   bptr[1] = '\0';
 
-  retval = json_format( buf, 2, NULL );
-
-  if ( retval )
-  {
-    free( buf );
-    return retval;
-  }
-  else
-    return prep_for_json_gc(buf);
+  return prep_for_json_gc(buf);
 }
 
 char *str_to_json( char *x )
